@@ -5,9 +5,9 @@ defmodule Releases.Plugin.ModifyRelup do
   use Mix.Releases.Plugin
   alias Edeliver.Relup.Instructions
 
-  def before_assembly(_), do: nil
+  def before_assembly(_, _), do: nil
 
-  def after_assembly(release = %Release{is_upgrade: true, version: version, name: name, output_dir: output_dir}) do
+  def after_assembly(release = %Release{is_upgrade: true, version: version, name: name, output_dir: output_dir}, _) do
     case System.get_env "SKIP_RELUP_MODIFICATIONS" do
       "true" -> nil
       _ ->
@@ -40,7 +40,7 @@ defmodule Releases.Plugin.ModifyRelup do
                 [{down_version, up_description, up_instructions}],
                 [{down_version, down_description, down_instructions}]
               }
-              res = write_relup(relup, relup_file)
+              _res = write_relup(relup, relup_file)
             error ->
               debug "Error when loading relup file: #{:io_lib.format('~p~n', [error])}"
               Mix.raise "Failed to load relup file from #{relup_file}\nYou can skip this step using the --skip-relup-mod option."
@@ -49,13 +49,12 @@ defmodule Releases.Plugin.ModifyRelup do
     end
     nil
   end
-  def after_assembly(_), do: nil
 
-  def before_package(_), do: nil
+  def before_package(_, _), do: nil
 
-  def after_package(_), do: nil
+  def after_package(_, _), do: nil
 
-  def after_cleanup(_), do: nil
+  def after_cleanup(_, _), do: nil
 
   defp changed_modules([{:load_object_code, {name, version, modules}}|_], name, version), do: modules
   defp changed_modules([_|rest], name, version), do: changed_modules(rest, name, version)
